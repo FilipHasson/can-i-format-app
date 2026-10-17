@@ -1,0 +1,60 @@
+# Builds the Windows app and publishes it as a GitHub Release.
+#
+# Push a tag to release:   git tag v0.2.0 && git push origin v0.2.0
+#
+# The asset keeps the same name on every release. That is what lets the site
+# link to /releases/latest/download/Can-I-Format-win32-x64.zip once and never
+# be edited again — renaming it per version would break that link silently.
+#
+# Run it by hand (Actions → Release → Run workflow) to get the build as a
+# workflow artifact without publishing anything.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # A release that fails its own tests is not one to hand to someone about
+      # to format a card.
+      - run: npm run typecheck
+      - run: npm test
+
+      - run: npm run package
+
+      - name: Zip
+        shell: pwsh
+        run: Compress-Archive -Path "dist/Can I Format-win32-x64/*" -DestinationPath "Can-I-Format-win32-x64.zip"
+
+      - name: Keep the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Can-I-Format-win32-x64
+          path: Can-I-Format-win32-x64.zip
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" Can-I-Format-win32-x64.zip \
+            --title "Can I Format? $GITHUB_REF_NAME" \
+            --generate-notes

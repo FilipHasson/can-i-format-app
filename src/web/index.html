@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Can I Format?</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%92%BE%3C/text%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="nav-home" class="back" type="button" hidden>← Cards and libraries</button>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">💾</span>
+          <h1>Can I Format?</h1>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="safety-note" class="safety-note">Read-only — this tool never erases anything</span>
+      </div>
+    </header>
+
+    <div id="job-banner" class="job-banner" hidden>
+      <div class="job-text">
+        <strong id="job-label"></strong>
+        <span id="job-message"></span>
+        <span id="job-detail" class="job-detail"></span>
+      </div>
+      <div
+        id="job-bar"
+        class="job-bar"
+        role="progressbar"
+        aria-label="Progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      ></div>
+      <button id="job-cancel" class="ghost" type="button">Cancel</button>
+    </div>
+
+    <main>
+      <!-- First run -->
+      <section id="view-setup" class="view" hidden>
+        <div class="hero">
+          <h2>Point me at your libraries</h2>
+          <p>
+            Add every place an imported photo or clip could live — your Lightroom catalog, your
+            pictures folder, your backup drive. Then a card gets checked against all of them before
+            you erase it.
+          </p>
+          <button id="setup-add" class="primary" type="button">Add a library</button>
+        </div>
+      </section>
+
+      <!-- Main dashboard -->
+      <section id="view-home" class="view" hidden>
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Cards</h2>
+            <div class="panel-actions">
+              <label class="inline-check">
+                <input id="volumes-show-drives" type="checkbox" />
+                Show other drives
+              </label>
+              <button id="volumes-refresh" class="ghost" type="button">Refresh</button>
+              <button id="scan-other" class="ghost" type="button">Scan another folder…</button>
+            </div>
+          </div>
+          <div id="volumes" class="cards"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Libraries</h2>
+            <div class="panel-actions">
+              <button id="rules-open" class="ghost" type="button">Rules…</button>
+              <button id="library-add" class="ghost" type="button">Add library</button>
+            </div>
+          </div>
+          <div id="libraries" class="library-list"></div>
+          <p id="rule-summary" class="rule-summary"></p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Recent scans</h2>
+            <div class="panel-actions">
+              <button id="recent-clear" class="danger" type="button" hidden>Clear history</button>
+            </div>
+          </div>
+          <div id="recent" class="recent-list"></div>
+        </section>
+      </section>
+
+      <!-- Scan result -->
+      <section id="view-result" class="view" hidden>
+        <div id="result-head" class="result-head"></div>
+        <div id="verdict" class="verdict"></div>
+        <div id="result-body"></div>
+      </section>
+    </main>
+
+    <!-- The notices GPLv3 section 5(d) asks an interactive program to show:
+         copyright, no warranty, that it may be shared under the licence, and
+         where to read it. Modified versions have to keep showing them. -->
+    <footer class="app-foot">
+      Can I Format © 2026 Filip Hasson. Free software under the GNU General Public License
+      v3, with no warranty.
+      <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">License</a>
+      ·
+      <a href="https://github.com/FilipHasson/can-i-format-app" target="_blank" rel="noopener">Source code</a>
+    </footer>
+
+    <dialog id="picker" class="picker">
+      <form method="dialog" class="picker-form">
+        <header class="picker-head">
+          <h3 id="picker-title">Choose a folder</h3>
+          <button value="cancel" class="ghost" type="submit">Close</button>
+        </header>
+        <div class="picker-path">
+          <button id="picker-up" class="ghost" type="button">↑ Up</button>
+          <input id="picker-input" type="text" spellcheck="false" autocomplete="off" />
+          <button id="picker-go" class="ghost" type="button">Go</button>
+        </div>
+        <div id="picker-shortcuts" class="picker-shortcuts"></div>
+        <ul id="picker-list" class="picker-list"></ul>
+        <footer class="picker-foot">
+          <span id="picker-hint" class="hint"></span>
+          <button id="picker-choose" class="primary" type="button">Use this folder</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="rules" class="picker">
+      <form method="dialog" class="picker-form">
+        <header class="picker-head">
+          <h3>Rules</h3>
+          <button value="cancel" class="ghost" type="submit">Close</button>
+        </header>
+        <div class="rule-block">
+          <label for="rule-input">A file is safe to erase when it is in…</label>
+          <div class="rule-row">
+            <input
+              id="rule-input"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="(main or backupB) and offsite"
+            />
+            <button id="rule-save" class="primary" type="button">Save</button>
+          </div>
+          <p id="rule-status" class="rule-status"></p>
+          <div id="kind-rules" class="kind-rules"></div>
+          <details class="rule-help">
+            <summary>How rules work</summary>
+            <p>
+              Combine library names with <code>and</code>, <code>or</code>, <code>not</code> and
+              parentheses. <code>(main or backupB) and offsite</code> means a file must be in
+              either working catalog <em>and</em> on the offsite drive before it counts as safe.
+            </p>
+          </details>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="import" class="picker import">
+      <form method="dialog" class="picker-form">
+        <header class="picker-head">
+          <h3 id="import-title">Import the missing files</h3>
+          <button value="cancel" class="ghost" type="submit">Close</button>
+        </header>
+
+        <div id="import-groups" class="import-groups"></div>
+
+        <div class="import-block">
+          <label for="import-folder">Folders to file them into</label>
+          <div class="template-row">
+            <select id="import-preset" aria-label="Ready-made layouts"></select>
+            <input
+              id="import-folder"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="{YYYY}/{MM}-{DD}-{YYYY}"
+              aria-describedby="import-example"
+            />
+          </div>
+          <div id="import-chips" class="token-chips"></div>
+          <p id="import-example" class="import-example" aria-live="polite"></p>
+
+          <label class="inline-check">
+            <input id="import-rename" type="checkbox" />
+            Rename files as they are copied
+          </label>
+          <input
+            id="import-filename"
+            type="text"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="{YYYY}{MM}{DD}-{name}"
+            hidden
+          />
+          <details class="rule-help">
+            <summary>What each one means</summary>
+            <ul id="import-tokens" class="token-list"></ul>
+          </details>
+        </div>
+
+        <div id="import-preview" class="import-preview"></div>
+
+        <footer class="picker-foot">
+          <span id="import-summary" class="hint"></span>
+          <button id="import-go" class="primary" type="button">Copy</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog id="sync" class="picker">
+      <form method="dialog" class="picker-form">
+        <header class="picker-head">
+          <h3>The files are copied — now tell Lightroom</h3>
+          <button value="cancel" class="ghost" type="submit">Close</button>
+        </header>
+        <div id="sync-body" class="sync-body"></div>
+        <footer class="picker-foot">
+          <span class="hint">Nothing has been erased. The card is untouched.</span>
+          <button id="sync-rescan" class="primary" type="button">Check the card again</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" hidden></div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

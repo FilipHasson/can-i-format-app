@@ -1,0 +1,13 @@
+# Normalise to LF everywhere, including in Windows working copies.
+#
+# src/cli.ts starts with a shebang, and a CRLF there makes the file
+# unexecutable on macOS and Linux — the kernel reads the trailing \r as part of
+# the interpreter path. Since this project is meant to run on all three
+# platforms, LF is the only safe choice.
+* text=auto eol=lf
+
+# Binary fixtures, should any get committed later.
+*.png binary
+*.jpg binary
+*.dng binary
+*.db  binary
