@@ -47,6 +47,7 @@ npm run app                 # in its own window (Electron)
 npm start                   # in your browser, at http://127.0.0.1:4111
 npm start -- --port 8080    # on another port
 npm start -- --no-open      # without opening a browser
+npm run dev                 # the browser UI, restarting on every source change
 ```
 
 Both use the same settings, index and scan history as an installed copy. Set
@@ -59,6 +60,7 @@ from a real one.
 npm test             # the whole suite, including end-to-end scans and the UI
 npm run typecheck
 npm run app:smoke    # boots the window against a throwaway install and screenshots it
+npm run clean        # remove dist/, build/ and generated fixtures
 ```
 
 Tests never touch a real installation: `test/setup.ts` points them at a
