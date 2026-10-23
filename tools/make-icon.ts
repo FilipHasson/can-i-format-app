@@ -31,7 +31,7 @@ type Rgb = readonly [number, number, number];
 
 const INK: Record<string, Rgb> = {
   // The card and its contacts, from web/favicon.svg.
-  green: [0x4c, 0xaf, 0x6e],
+  green: [0x3a, 0x9a, 0x5b],
   white: [0xff, 0xff, 0xff],
 };
 
