@@ -10,8 +10,8 @@
  *   node tools/make-icon.ts build/icon.ico   # every size Windows asks for
  *   node tools/make-icon.ts build/icon.png   # one 256px sheet
  *
- * The mark is the floppy disk the page already uses as its brand, in the
- * accent blue from `web/style.css`, so the taskbar and the header agree.
+ * The mark is the SD card the page already uses as its brand
+ * (`web/favicon.svg`), in the same green, so the taskbar and the header agree.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -30,13 +30,9 @@ const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 type Rgb = readonly [number, number, number];
 
 const INK: Record<string, Rgb> = {
-  // --accent, --surface, --border, --text-faint from web/style.css.
-  blue: [0x2a, 0x6d, 0xf4],
-  deep: [0x1b, 0x4c, 0xb8],
+  // The card and its contacts, from web/favicon.svg.
+  green: [0x3a, 0x9a, 0x5b],
   white: [0xff, 0xff, 0xff],
-  panel: [0xdf, 0xe3, 0xe8],
-  steel: [0x8a, 0x94, 0xa0],
-  slate: [0x5c, 0x67, 0x73],
 };
 
 /** A shape answers one question: is this point inside me? */
@@ -134,36 +130,28 @@ class Sheet {
   }
 }
 
+/** A rounded rectangle with its top-right corner cut off at 45°, `cut` deep. */
+function clippedRect(x0: number, y0: number, x1: number, y1: number, r: number, cut: number): Shape {
+  const body = roundRect(x0, y0, x1, y1, r);
+  return (x, y) => body(x, y) && x - x1 + cut <= y - y0;
+}
+
 /**
- * The floppy, drawn once in fractions of the icon.
+ * The SD card, drawn once in fractions of the icon: `web/favicon.svg`, which
+ * is also the header's mark, scaled so the card stands 0.9 of the icon tall.
  *
- * It is the save icon's proportions rather than a real disk's: shutter high
- * and right of centre, label filling the bottom and running into the edge.
- * A corner notch was tried and cut for reading as a folded sheet of paper —
- * at 32px the thing has to be recognised, not examined.
+ * The clipped corner is what makes it an SD card and not a phone or a page,
+ * so it is cut deep enough to survive 16px; the contacts only come in once
+ * there are pixels to draw them with.
  */
 function drawIcon(size: number): Uint8Array {
   const sheet = new Sheet(size);
-  sheet.fill(roundRect(0, 0, 1, 1, 0.22), INK.blue as Rgb);
+  sheet.fill(clippedRect(0.136, 0.05, 0.864, 0.95, 0.107, 0.21), INK.green as Rgb);
 
-  // A darker disk under the body, a shade larger. White on blue is already
-  // stark; this gives the edge somewhere to land at the sizes where a
-  // one-pixel outline would be swallowed by the anti-aliasing.
-  sheet.fill(roundRect(0.165, 0.145, 0.835, 0.855, 0.045), INK.deep as Rgb);
-  sheet.fill(roundRect(0.18, 0.16, 0.82, 0.84, 0.035), INK.white as Rgb);
-
-  // Shutter: metal plate at the top with its window, the part of a disk that
-  // is nothing else's shape.
-  sheet.fill(roundRect(0.31, 0.16, 0.57, 0.395, 0.012), INK.steel as Rgb);
-  sheet.fill(roundRect(0.455, 0.19, 0.525, 0.365, 0.008), INK.white as Rgb);
-
-  // Label: to the bottom edge, the way the save icon has always drawn it.
-  sheet.fill(roundRect(0.27, 0.50, 0.73, 0.84, 0.02), INK.panel as Rgb);
-  if (size >= 32) {
-    for (const y of [0.575, 0.65]) {
-      sheet.fill(roundRect(0.32, y, 0.68, y + 0.038, 0.019), INK.slate as Rgb);
+  if (size >= 24) {
+    for (const x of [0.286, 0.41, 0.534]) {
+      sheet.fill(roundRect(x, 0.157, x + 0.069, 0.35, 0.021), INK.white as Rgb);
     }
-    sheet.fill(roundRect(0.32, 0.725, 0.55, 0.763, 0.019), INK.steel as Rgb);
   }
 
   return sheet.resolve();

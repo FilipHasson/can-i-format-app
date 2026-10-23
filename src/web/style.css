@@ -173,7 +173,8 @@ button.back:hover:not(:disabled) {
   gap: 0.6rem;
 }
 .brand-mark {
-  font-size: 1.2rem;
+  display: block;
+  flex: none;
 }
 
 .topbar-right {

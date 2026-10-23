@@ -1,6 +1,6 @@
 {
   "name": "can-i-format-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "GPL-3.0-only",
   "description": "Audit physical media (SD/CFexpress/SSD) against your media libraries and answer: can I format this card?",

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- An SD card: the clipped corner and its contacts. Also the top bar's mark.
+       Easy Exif's green, a shade darker; like its mark, the same in both themes. -->
+  <path fill="#3a9a5b" d="M7 1.5h8.6L20.5 6.4V20a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 20V5A3.5 3.5 0 0 1 7 1.5Z" />
+  <g fill="#ffffff">
+    <rect x="7" y="4" width="1.6" height="4.5" rx="0.5" />
+    <rect x="9.9" y="4" width="1.6" height="4.5" rx="0.5" />
+    <rect x="12.8" y="4" width="1.6" height="4.5" rx="0.5" />
+  </g>
+</svg>
