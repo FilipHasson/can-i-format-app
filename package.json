@@ -19,13 +19,15 @@
     "cif": "src/cli.ts"
   },
   "scripts": {
+    "dev": "node --watch --disable-warning=ExperimentalWarning src/cli.ts --port 4111 --no-open",
     "start": "node --disable-warning=ExperimentalWarning src/cli.ts",
+    "test": "node --disable-warning=ExperimentalWarning --import ./test/setup.ts --test \"test/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "clean": "node -e \"for (const p of ['dist', 'build', 'fixtures', 'tmp']) require('node:fs').rmSync(p, { recursive: true, force: true })\"",
     "app": "npm run icon --silent && electron .",
     "app:smoke": "npm run icon --silent && electron electron/smoke.ts",
     "icon": "node tools/make-icon.ts build/icon.ico",
     "package": "npm run icon --silent && electron-packager . --overwrite --out=dist --asar --icon=build/icon.ico --app-copyright=\"Filip Hasson\" --ignore=\"^/(test|tools|dist|fixtures|\\.github)($|/)\" --ignore=\"^/build/(preview|smoke)\" --ignore=\"^/(tsconfig|CLAUDE)\\.\"",
-    "test": "node --disable-warning=ExperimentalWarning --import ./test/setup.ts --test \"test/*.test.ts\"",
-    "typecheck": "tsc --noEmit",
     "fixtures": "node tools/make-fixtures.ts",
     "probe": "node --disable-warning=ExperimentalWarning tools/preview-probe.ts",
     "probe:catalog": "node --disable-warning=ExperimentalWarning tools/catalog-probe.ts",
